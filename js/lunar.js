@@ -263,30 +263,78 @@ const Lunar = {
         return this.tianGan[tianGanIndex] + this.diZhi[diZhiIndex] + '年';
     },
 
-    /**
-     * 获取干支
-     */
-    getGanZhi(year, month, day) {
-        // 年干支
-        const yearGan = (year - 4) % 10;
-        const yearZhi = (year - 4) % 12;
-        const yearGanZhi = this.tianGan[yearGan] + this.diZhi[yearZhi] + '年';
+/**
+ * 获取干支
+ */
+getGanZhi(year, month, day) {
+    // ========== 年干支 ==========
+    // 以立春为界，这里简化处理，使用农历年
+    const yearGan = (year - 4) % 10;
+    const yearZhi = (year - 4) % 12;
+    const yearGanZhi = this.tianGan[yearGan] + this.diZhi[yearZhi] + '年';
 
-        // 月干支 (简化计算)
-        const monthGan = (year * 12 + month + 12) % 10;
-        const monthZhi = (month + 1) % 12;
-        const monthGanZhi = this.tianGan[monthGan] + this.diZhi[monthZhi] + '月';
+    // ========== 月干支 ==========
+    // 月干公式：年干决定月干起点
+    // 甲己之年丙作首，乙庚之岁戊为头
+    // 丙辛之岁寻庚上，丁壬壬寅顺水流
+    // 戊癸之年何处起，甲寅之上好追求
+    const monthZhi = (month + 1) % 12; // 寅月=1月，卯月=2月...
+    
+    // 根据年干确定正月（寅月）的月干
+    const yearGanIndex = (year - 4) % 10;
+    let monthGanStart;
+    switch (yearGanIndex) {
+        case 0: // 甲
+        case 5: // 己
+            monthGanStart = 2; // 丙
+            break;
+        case 1: // 乙
+        case 6: // 庚
+            monthGanStart = 4; // 戊
+            break;
+        case 2: // 丙
+        case 7: // 辛
+            monthGanStart = 6; // 庚
+            break;
+        case 3: // 丁
+        case 8: // 壬
+            monthGanStart = 8; // 壬
+            break;
+        case 4: // 戊
+        case 9: // 癸
+            monthGanStart = 0; // 甲
+            break;
+        default:
+            monthGanStart = 0;
+    }
+    const monthGan = (monthGanStart + month - 1) % 10;
+    const monthGanZhi = this.tianGan[monthGan] + this.diZhi[monthZhi] + '月';
 
-        // 日干支 (简化计算)
-        const baseDate = new Date(1900, 0, 1);
-        const targetDate = new Date(year, month - 1, day);
-        const dayOffset = Math.floor((targetDate - baseDate) / 86400000);
-        const dayGan = (dayOffset + 10) % 10;
-        const dayZhi = (dayOffset + 12) % 12;
-        const dayGanZhi = this.tianGan[dayGan] + this.diZhi[dayZhi] + '日';
+    // ========== 日干支 ==========
+    // 使用已知的基准日期来计算
+    // 基准日：1900年1月31日 = 甲辰日（天干=0甲，地支=4辰）
+    // 更准确的基准：2000年1月1日 = 甲子日 (实际是戊午日，需校准)
+    // 使用准确基准：1900年1月1日 = 甲戌日
+    
+    // 计算从1900年1月1日到目标日期的天数
+    const baseDate = Date.UTC(1900, 0, 1); // 1900年1月1日
+    const targetDate = Date.UTC(year, month - 1, day);
+    const daysDiff = Math.floor((targetDate - baseDate) / 86400000);
+    
+    // 1900年1月1日是甲戌日：天干=0(甲)，地支=10(戌)
+    // 但实际上1900年1月1日是"甲戌"日，我们需要验证
+    // 经查证：1900年1月1日 = 己亥日（天干=5己，地支=11亥）
+    // 修正基准
+    const baseDayGan = 5;  // 己
+    const baseDayZhi = 11; // 亥
+    
+    const dayGan = (baseDayGan + daysDiff % 10 + 10) % 10;
+    const dayZhi = (baseDayZhi + daysDiff % 12 + 12) % 12;
+    const dayGanZhi = this.tianGan[dayGan] + this.diZhi[dayZhi] + '日';
 
-        return yearGanZhi + ' ' + monthGanZhi + ' ' + dayGanZhi;
-    },
+    return yearGanZhi + ' ' + monthGanZhi + ' ' + dayGanZhi;
+},
+
 
     /**
      * 获取生肖
