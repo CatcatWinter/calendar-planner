@@ -331,7 +331,7 @@ const Lunar = {
             solarDate.day
         );
 
-        const daysDiff = Math.floor((targetDate - baseDate) / 86400000);
+        const daysDiff = Math.round((targetDate - baseDate) / 86400000);
         const dayGan = (baseDayGan + daysDiff) % 10;
         const dayZhi = (baseDayZhi + daysDiff) % 12;
         const dayGanZhi = this.tianGan[dayGan] + this.diZhi[dayZhi] + '日';
