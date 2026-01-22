@@ -264,24 +264,24 @@ const Lunar = {
     },
 
 /**
- * 获取干支
+ * 获取干支（修复版）
+ * @param {number} lunarYear - 农历年
+ * @param {number} lunarMonth - 农历月
+ * @param {number} lunarDay - 农历日
  */
-getGanZhi(year, month, day) {
+getGanZhi(lunarYear, lunarMonth, lunarDay) {
     // ========== 年干支 ==========
     // 以立春为界，这里简化处理，使用农历年
-    const yearGan = (year - 4) % 10;
-    const yearZhi = (year - 4) % 12;
+    const yearGan = (lunarYear - 4) % 10;
+    const yearZhi = (lunarYear - 4) % 12;
     const yearGanZhi = this.tianGan[yearGan] + this.diZhi[yearZhi] + '年';
 
     // ========== 月干支 ==========
     // 月干公式：年干决定月干起点
-    // 甲己之年丙作首，乙庚之岁戊为头
-    // 丙辛之岁寻庚上，丁壬壬寅顺水流
-    // 戊癸之年何处起，甲寅之上好追求
-    const monthZhi = (month + 1) % 12; // 寅月=1月，卯月=2月...
+    const monthZhi = (lunarMonth + 1) % 12; // 寅月=1月，卯月=2月...
     
     // 根据年干确定正月（寅月）的月干
-    const yearGanIndex = (year - 4) % 10;
+    const yearGanIndex = (lunarYear - 4) % 10;
     let monthGanStart;
     switch (yearGanIndex) {
         case 0: // 甲
@@ -307,24 +307,28 @@ getGanZhi(year, month, day) {
         default:
             monthGanStart = 0;
     }
-    const monthGan = (monthGanStart + month - 1) % 10;
+    const monthGan = (monthGanStart + lunarMonth - 1) % 10;
     const monthGanZhi = this.tianGan[monthGan] + this.diZhi[monthZhi] + '月';
 
     // ========== 日干支 ==========
-    // 使用已知的基准日期来计算
-    // 使用准确基准：1900年1月1日 = 甲戌日
+    // 关键修复：需要先将农历转换为公历，再计算日干支
+    const solarDate = this.lunarToSolar(lunarYear, lunarMonth, lunarDay, false);
     
-    // 计算从1900年1月1日到目标日期的天数
+    if (!solarDate) {
+        return yearGanZhi + ' ' + monthGanZhi + ' 未知';
+    }
+    
+    // 计算从1900年1月1日到目标公历日期的天数
     const baseDate = Date.UTC(1900, 0, 1); // 1900年1月1日
-    const targetDate = Date.UTC(year, month - 1, day);
+    const targetDate = Date.UTC(solarDate.year, solarDate.month - 1, solarDate.day);
     const daysDiff = Math.floor((targetDate - baseDate) / 86400000);
     
     // 1900年1月1日是甲戌日：天干=0(甲)，地支=10(戌)
     const baseDayGan = 0;  // 甲
     const baseDayZhi = 10; // 戌
     
-    const dayGan = (baseDayGan + daysDiff % 10 + 10) % 10;
-    const dayZhi = (baseDayZhi + daysDiff % 12 + 12) % 12;
+    const dayGan = (baseDayGan + daysDiff) % 10;
+    const dayZhi = (baseDayZhi + daysDiff) % 12;
     const dayGanZhi = this.tianGan[dayGan] + this.diZhi[dayZhi] + '日';
 
     return yearGanZhi + ' ' + monthGanZhi + ' ' + dayGanZhi;
