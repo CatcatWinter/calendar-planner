@@ -318,15 +318,19 @@ const Lunar = {
             return yearGanZhi + ' ' + monthGanZhi + ' 未知';
         }
         
-        // 计算从1900年1月1日到目标公历日期的天数
-        const baseDate = Date.UTC(1900, 0, 1); // 1900年1月1日
-        const targetDate = Date.UTC(solarDate.year, solarDate.month - 1, solarDate.day);
-        const daysDiff = Math.floor((targetDate - baseDate) / 86400000);
-        
-        // 1900年1月1日是甲戌日：天干=0(甲)，地支=10(戌)
-        const baseDayGan = 0;  // 甲
-        const baseDayZhi = 10; // 戌
-        
+        // 基准：1900-01-31（农历1900-01-01）
+        // 干支：甲辰日
+        const baseDate = Date.UTC(1900, 0, 31);
+        const baseDayGan = 0; // 甲
+        const baseDayZhi = 4; // 辰
+
+        const targetDate = Date.UTC(
+            solarDate.year,
+            solarDate.month - 1,
+            solarDate.day
+        );
+
+        const daysDiff = Math.round((targetDate - baseDate) / 86400000);
         const dayGan = (baseDayGan + daysDiff) % 10;
         const dayZhi = (baseDayZhi + daysDiff) % 12;
         const dayGanZhi = this.tianGan[dayGan] + this.diZhi[dayZhi] + '日';
