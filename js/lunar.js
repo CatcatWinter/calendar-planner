@@ -312,8 +312,6 @@ getGanZhi(year, month, day) {
 
     // ========== 日干支 ==========
     // 使用已知的基准日期来计算
-    // 基准日：1900年1月31日 = 甲辰日（天干=0甲，地支=4辰）
-    // 更准确的基准：2000年1月1日 = 甲子日 (实际是戊午日，需校准)
     // 使用准确基准：1900年1月1日 = 甲戌日
     
     // 计算从1900年1月1日到目标日期的天数
@@ -322,11 +320,8 @@ getGanZhi(year, month, day) {
     const daysDiff = Math.floor((targetDate - baseDate) / 86400000);
     
     // 1900年1月1日是甲戌日：天干=0(甲)，地支=10(戌)
-    // 但实际上1900年1月1日是"甲戌"日，我们需要验证
-    // 经查证：1900年1月1日 = 己亥日（天干=5己，地支=11亥）
-    // 修正基准
-    const baseDayGan = 5;  // 己
-    const baseDayZhi = 11; // 亥
+    const baseDayGan = 0;  // 甲
+    const baseDayZhi = 10; // 戌
     
     const dayGan = (baseDayGan + daysDiff % 10 + 10) % 10;
     const dayZhi = (baseDayZhi + daysDiff % 12 + 12) % 12;
