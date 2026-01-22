@@ -244,13 +244,14 @@ const Lunar = {
         offset += day - 1;
 
         // 计算公历日期
-        const baseDate = new Date(1900, 0, 31);
-        const targetDate = new Date(baseDate.getTime() + offset * 86400000);
+        const baseTime = Date.UTC(1900, 0, 31);
+        const targetTime = baseTime + offset * 86400000;
+        const targetDate = new Date(targetTime);
 
         return {
-            year: targetDate.getFullYear(),
-            month: targetDate.getMonth() + 1,
-            day: targetDate.getDate()
+            year: targetDate.getUTCFullYear(),
+            month: targetDate.getUTCMonth() + 1,
+            day: targetDate.getUTCDate()
         };
     },
 
