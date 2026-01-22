@@ -325,7 +325,11 @@ const Lunar = {
         const baseDayGan = 0; // 甲
         const baseDayZhi = 4; // 辰
 
-        const targetDate = Date.UTC(year, month - 1, day);
+        const targetDate = Date.UTC(
+            solarDate.year,
+            solarDate.month - 1,
+            solarDate.day
+        );
 
         const daysDiff = Math.floor((targetDate - baseDate) / 86400000);
         const dayGan = (baseDayGan + daysDiff) % 10;
